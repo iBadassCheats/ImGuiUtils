@@ -5,6 +5,80 @@
                 height += ImGui.GetIO().MouseDelta.Y;
         }
 
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        public string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return null;
+        }
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        public string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return null;
+        }
+
+        public bool CheckWindow(Process process)
+        {
+            if (this.GetActiveWindowTitle() == process.MainWindowTitle || this.GetActiveWindowTitle() == this.title)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static void DrawOverlay()
+        {
+            ImGui.SetNextWindowPos(new Vector2(0, 0));
+            ImGui.SetNextWindowSize(new Vector2 (ScreenX, ScreenY));
+            if (ImGui.Begin("Overlay", ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoBringToFrontOnFocus
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoInputs
+                | ImGuiWindowFlags.NoCollapse
+                | ImGuiWindowFlags.NoScrollbar
+                | ImGuiWindowFlags.NoScrollWithMouse
+                | ImGuiWindowFlags.NoSavedSettings
+                )
+            )
+            {
+                ImGui.PushFont(ImGuiRenderer.WatermarkScale);
+
+                // Draw Text, Box, Others
+
+                ImGui.PopFont();
+                ImGui.End();
+            }
+
         internal static void verticalSplitter(float width, float height)
         {
             ImGui.SameLine();
