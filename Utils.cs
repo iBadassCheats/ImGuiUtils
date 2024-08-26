@@ -24,6 +24,55 @@
             return null;
         }
 
+    public static void VerticalTabBar(string[] tabNames, ref int selectedTab)
+    {
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1.0f);
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0.0f);
+
+        for (var i = 0; i < tabNames.Length; ++i)
+            if (ImGui.Button(tabNames[i], new Vector2(-1, 30)))
+                selectedTab = i;
+
+        ImGui.PopStyleVar(2);
+    }
+
+    private static readonly ImmutableArray<(string Title, Action RenderPage)> PagesArray = new[]
+    {
+        ("ESP", new Action(test)),
+        ("Aim Bot", new Action(RenderAimBotPage))
+    }.ToImmutableArray();
+
+    public static void RenderMenu()
+    {
+        ImGui.Begin("Styled Menu");
+        {
+            ImGui.SetWindowSize(new Vector2(500, 300));
+            ImGui.BeginChild("TabsAndContent", new Vector2(150, -1), true, ImGuiWindowFlags.None);
+            {
+                ImGuiHelper.VerticalTabBar(PagesArray.Select(x => x.Title).ToArray(), ref Main.SelectedTab);
+            }
+            ImGui.EndChild();
+            ImGui.SameLine();
+            ImGui.BeginChild("MainContent", new Vector2(0, -1), true, ImGuiWindowFlags.None);
+            {
+                PagesArray.Select(x => x.RenderPage).ElementAt(Main.SelectedTab).Invoke();
+            }
+            ImGui.EndChild();
+        }
+        ImGui.End();
+    }
+
+    public static void RenderAimBotPage()
+    {
+        ImGui.TextUnformatted("Aimbot Options:");
+        ImGui.Separator();
+        {
+            ImGui.BeginGroup();
+
+            ImGui.EndGroup();
+        }
+    }
+
         public bool CheckWindow(Process process)
         {
             if (this.GetActiveWindowTitle() == process.MainWindowTitle || this.GetActiveWindowTitle() == this.title)
